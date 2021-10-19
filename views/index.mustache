@@ -1,0 +1,21 @@
+<html>
+    <body>
+        <form action="/send" method="POST" enctype="multipart/form-data">
+            <input type="file" name="img" placeholder="Photo"></input><br><br>
+            <input type="text" name="title" placeholder="Titre"></input><br><br>
+            <textarea name="desc" cols="50" rows="10" placeholder="Description"></textarea><br><br>
+            <input type="submit">
+        </form>
+
+        {{#imgData}}
+            <hr>
+            <div>
+                <h2 style="text-align:center;">{{title}}</h2>
+                <div style="display: flex; align-items: center; justify-content: center;">
+                    <img src="img/{{img}}" width="50%">
+                </div>
+                <p style="text-align:center;">{{desc}}</p>
+            </div>
+        {{/imgData}}
+    </body>
+</html>
