@@ -86,26 +86,30 @@ app.get('/sended', async (req, res) => {
 
 app.post('/send', async (req, res) => {
 
-    req.files.img.mv(`./img/${req.files.img.name}`, (err) => {
-        if (err)
-            return res.status(500).send(err);
+    const dbConnection = getConnection("dataBase");
+    dbConnection.query(`SELECT MAX(id) FROM "imgDatabase";`, function (error, results, fields) {
+        if (error) throw error;
+        req.files.img.name = 'img' + (results.rows[0].max + 1) + '.jpg';
+        req.files.img.mv(`./img/${req.files.img.name}`, (err) => {
+            if (err)
+                return res.status(500).send(err);
+        });
+
+        const title = req.body.title;
+        const desc = req.body.desc;
+        const img = req.files.img.name;
+
+        try {
+            const dbConnection = getConnection("dataBase");
+
+            dbConnection.query(`INSERT INTO "imgDatabase"(id, title, "desc", img) VALUES ((SELECT MAX(id) + 1 FROM "imgDatabase"), '${title}','${desc}','${img}');`, function (error, results, fields) { if (error) throw error; });
+            res.redirect("/sended");
+        } catch (e) {
+            res.status(500).send("File not upload");
+            console.log(e);
+        }
+        
     });
-
-    const title = req.body.title;
-    const desc = req.body.desc;
-    const img = req.files.img.name;
-
-    console.log(img);
-
-    try {
-        const dbConnection = getConnection("dataBase");
-
-        dbConnection.query(`INSERT INTO "imgDatabase"(id, title, "desc", img) VALUES ((SELECT MAX(id) + 1 FROM "imgDatabase"), '${title}','${desc}','${img}');`, function (error, results, fields) { if (error) throw error; });
-        res.redirect("/sended");
-    } catch (e) {
-        res.status(500).send("File not upload");
-        console.log(e);
-    }
 
 });
 

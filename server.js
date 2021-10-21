@@ -121,26 +121,31 @@ app.get('/sended', function (req, res) { return __awaiter(_this, void 0, void 0,
     });
 }); });
 app.post('/send', function (req, res) { return __awaiter(_this, void 0, void 0, function () {
-    var title, desc, img, dbConnection;
+    var dbConnection;
     return __generator(this, function (_a) {
-        req.files.img.mv("./img/" + req.files.img.name, function (err) {
-            if (err)
-                return res.status(500).send(err);
+        dbConnection = getConnection("dataBase");
+        dbConnection.query("SELECT MAX(id) FROM \"imgDatabase\";", function (error, results, fields) {
+            if (error)
+                throw error;
+            req.files.img.name = 'img' + (results.rows[0].max + 1) + '.jpg';
+            req.files.img.mv("./img/" + req.files.img.name, function (err) {
+                if (err)
+                    return res.status(500).send(err);
+            });
+            var title = req.body.title;
+            var desc = req.body.desc;
+            var img = req.files.img.name;
+            try {
+                var dbConnection_1 = getConnection("dataBase");
+                dbConnection_1.query("INSERT INTO \"imgDatabase\"(id, title, \"desc\", img) VALUES ((SELECT MAX(id) + 1 FROM \"imgDatabase\"), '" + title + "','" + desc + "','" + img + "');", function (error, results, fields) { if (error)
+                    throw error; });
+                res.redirect("/sended");
+            }
+            catch (e) {
+                res.status(500).send("File not upload");
+                console.log(e);
+            }
         });
-        title = req.body.title;
-        desc = req.body.desc;
-        img = req.files.img.name;
-        console.log(img);
-        try {
-            dbConnection = getConnection("dataBase");
-            dbConnection.query("INSERT INTO \"imgDatabase\"(id, title, \"desc\", img) VALUES ((SELECT MAX(id) + 1 FROM \"imgDatabase\"), '" + title + "','" + desc + "','" + img + "');", function (error, results, fields) { if (error)
-                throw error; });
-            res.redirect("/sended");
-        }
-        catch (e) {
-            res.status(500).send("File not upload");
-            console.log(e);
-        }
         return [2 /*return*/];
     });
 }); });
