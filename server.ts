@@ -2,11 +2,9 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const mustache = require('mustache');
 const fs = require('fs');
-const axios = require('axios');
 const http = require('http');
 const mustacheExpress = require('mustache-express');
 const fileUpload = require('express-fileupload');
-const session = require('express-session');
 
 const path = require('path');
 const { send } = require('express/lib/response');
@@ -15,12 +13,11 @@ const reflectMetaData = require('reflect-metadata');
 const { createConnection } = require('typeorm');
 const { getConnection } = require("typeorm");
 
-const passwordHash = require('password-hash');
-
 const port = 3000;
 
 let app = express();
 
+//Connexion à la base de données
 const conn = async () => {
     try {
         const connection = await createConnection({
@@ -39,24 +36,14 @@ const conn = async () => {
 
 conn();
 
+//Initalisation du file upload
 app.use(fileUpload({
     limits: { filesSize: 50 * 1024 * 1024 },
     useTempFiles: true,
     tempFileDir: '/tmp/'
 }));
 
-app.set('trust proxy', 1)
-app.use(session({
-    secret: 'webtech2022',
-    resave: false,
-    saveUninitialized: true,
-    cookie: {
-        secure: false,
-        expires: false,
-        maxAge: 30 * 24 * 60 * 60 * 1000
-    }
-}))
-
+//Initalisation des autres extensions
 app.engine('mustache', mustacheExpress());
 app.set('view engine', 'mustache');
 app.set('views', __dirname + '/views');
@@ -67,6 +54,7 @@ app.use(bodyParser.urlencoded({ extended: false }));
 
 app.use(express.static(path.join(__dirname)));
 
+//Affichage du formulaire et des images déjà enregistré
 app.get('/', async (req, res) => {
 
 
@@ -80,12 +68,10 @@ app.get('/', async (req, res) => {
     });
 });
 
-app.get('/sended', async (req, res) => {
-    res.redirect('/')
-});
-
+//Enregistrement de la nouvelle image
 app.post('/send', async (req, res) => {
 
+    //renommage de l'image pour éviter les doublons
     const dbConnection = getConnection("dataBase");
     dbConnection.query(`SELECT MAX(id) FROM "imgDatabase";`, function (error, results, fields) {
         if (error) throw error;
@@ -95,6 +81,7 @@ app.post('/send', async (req, res) => {
                 return res.status(500).send(err);
         });
 
+        //insertion en base de données
         const title = req.body.title;
         const desc = req.body.desc;
         const img = req.files.img.name;
@@ -103,7 +90,7 @@ app.post('/send', async (req, res) => {
             const dbConnection = getConnection("dataBase");
 
             dbConnection.query(`INSERT INTO "imgDatabase"(id, title, "desc", img) VALUES ((SELECT MAX(id) + 1 FROM "imgDatabase"), '${title}','${desc}','${img}');`, function (error, results, fields) { if (error) throw error; });
-            res.redirect("/sended");
+            res.redirect("/");
         } catch (e) {
             res.status(500).send("File not upload");
             console.log(e);

@@ -39,19 +39,17 @@ var express = require('express');
 var bodyParser = require('body-parser');
 var mustache = require('mustache');
 var fs = require('fs');
-var axios = require('axios');
 var http = require('http');
 var mustacheExpress = require('mustache-express');
 var fileUpload = require('express-fileupload');
-var session = require('express-session');
 var path = require('path');
 var send = require('express/lib/response').send;
 var reflectMetaData = require('reflect-metadata');
 var createConnection = require('typeorm').createConnection;
 var getConnection = require("typeorm").getConnection;
-var passwordHash = require('password-hash');
 var port = 3000;
 var app = express();
+//Connexion à la base de données
 var conn = function () { return __awaiter(_this, void 0, void 0, function () {
     var connection, e_1;
     return __generator(this, function (_a) {
@@ -79,28 +77,20 @@ var conn = function () { return __awaiter(_this, void 0, void 0, function () {
     });
 }); };
 conn();
+//Initalisation du file upload
 app.use(fileUpload({
     limits: { filesSize: 50 * 1024 * 1024 },
     useTempFiles: true,
     tempFileDir: '/tmp/'
 }));
-app.set('trust proxy', 1);
-app.use(session({
-    secret: 'webtech2022',
-    resave: false,
-    saveUninitialized: true,
-    cookie: {
-        secure: false,
-        expires: false,
-        maxAge: 30 * 24 * 60 * 60 * 1000
-    }
-}));
+//Initalisation des autres extensions
 app.engine('mustache', mustacheExpress());
 app.set('view engine', 'mustache');
 app.set('views', __dirname + '/views');
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(express.static(path.join(__dirname)));
+//Affichage du formulaire et des images déjà enregistré
 app.get('/', function (req, res) { return __awaiter(_this, void 0, void 0, function () {
     var dbConnection;
     return __generator(this, function (_a) {
@@ -114,12 +104,7 @@ app.get('/', function (req, res) { return __awaiter(_this, void 0, void 0, funct
         return [2 /*return*/];
     });
 }); });
-app.get('/sended', function (req, res) { return __awaiter(_this, void 0, void 0, function () {
-    return __generator(this, function (_a) {
-        res.redirect('/');
-        return [2 /*return*/];
-    });
-}); });
+//Enregistrement de la nouvelle image
 app.post('/send', function (req, res) { return __awaiter(_this, void 0, void 0, function () {
     var dbConnection;
     return __generator(this, function (_a) {
@@ -132,6 +117,7 @@ app.post('/send', function (req, res) { return __awaiter(_this, void 0, void 0, 
                 if (err)
                     return res.status(500).send(err);
             });
+            //insertion en base de données
             var title = req.body.title;
             var desc = req.body.desc;
             var img = req.files.img.name;
@@ -139,7 +125,7 @@ app.post('/send', function (req, res) { return __awaiter(_this, void 0, void 0, 
                 var dbConnection_1 = getConnection("dataBase");
                 dbConnection_1.query("INSERT INTO \"imgDatabase\"(id, title, \"desc\", img) VALUES ((SELECT MAX(id) + 1 FROM \"imgDatabase\"), '" + title + "','" + desc + "','" + img + "');", function (error, results, fields) { if (error)
                     throw error; });
-                res.redirect("/sended");
+                res.redirect("/");
             }
             catch (e) {
                 res.status(500).send("File not upload");
