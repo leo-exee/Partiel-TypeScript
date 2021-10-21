@@ -1,21 +1,100 @@
-<html>
+<!doctype html>
+<html lang="fr">
+  <head>
+    <title>PARTIEL</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+  </head>
     <body>
-        <form action="/send" method="POST" enctype="multipart/form-data">
-            <input type="file" name="img" placeholder="Photo" required></input><br><br>
-            <input type="text" name="title" placeholder="Titre" required></input><br><br>
-            <textarea name="desc" cols="50" rows="10" placeholder="Description" required></textarea><br><br>
-            <button>Ajouter</button>
-        </form>
 
-        {{#imgData}}
-            <hr>
-            <div>
-                <h2 style="text-align:center;">{{title}}</h2>
-                <div style="display: flex; align-items: center; justify-content: center;">
-                    <img src="img/{{img}}" width="50%">
+
+        <div class="container">
+            <form action="/send" method="POST" enctype="multipart/form-data" class="form-group">
+                <input class="form-control" type="text" name="title" placeholder="Titre" required></input>
+                <br>
+                <input class="form-control" type="file" name="img" placeholder="Photo" required id="inputGroupFile04">
+                <br>
+                <textarea class="form-control" name="desc" cols="100%" rows="5" placeholder="Description" required></textarea>
+                <button type="submit" class="submit btn btn-outline-dark">Ajouter</button>
+            </form>
+
+            <div class="row">
+                {{#imgData}}
+                <div class="col-lg-3 col-md-4 col-sm-6 col-6">
+                    <div class="card">
+                        <img src="img/{{img}}" class="img card-img-top" alt="...">
+                        
+                        <div class="card-body bg-dark"">
+                            <h5 class="card-title">{{title}}</h5>
+                            <p class="card-text">{{desc}}</p>
+                            <a href="img/{{img}}" class="btn btn-outline-light" target="_blank">Ouvrir</a>
+                        </div>
+                    </div>
                 </div>
-                <p style="text-align:center;">{{desc}}</p>
+                {{/imgData}}
             </div>
-        {{/imgData}}
+        </div>
+
+        <style>
+
+            .img {
+                border-radius: 25px 25px 0 0;
+                width: 100%;
+                height: 100%;
+                object-fit: cover;
+            }
+
+            .btn {
+                border : 2px solid;
+                border-radius: 10px;
+            }
+
+            .container {
+                margin-top: 25px;
+                margin-bottom: 25px;
+            }
+            .card {
+                width: 100%; 
+                border-radius: 25px; 
+                color: white;
+            }
+
+            .card-body {
+                border-radius: 0 0 25px 25px;
+            }
+
+            textarea {
+                width: 100%;
+            }
+
+            .submit {
+                border : 3px solid;
+                margin: 10px 35%;
+                width: 30%;
+                font-size: 25px;
+            }
+        </style>
+
+        <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
+        <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
+    
+        <script>
+
+            var cw = $('.img').width();
+            console.log(cw);
+            $('.img').css({
+                'height': cw + 'px'
+            });
+
+            function handle(evnt) {
+            var cw = $('.img').width();
+                $('.img').css({
+                'height': cw + 'px'
+                });
+            }
+        </script>
+
     </body>
 </html>
