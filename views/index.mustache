@@ -12,8 +12,8 @@
         <div class="container">
             <form action="/send" method="POST" enctype="multipart/form-data" class="form-group">
                 <input class="form-control" type="text" name="title" placeholder="Titre" required></input>
-                <br>
-                <input class="form-control" type="file" name="img" placeholder="Photo" required id="inputGroupFile04">
+                <input type="file" class="inputfile" accept="image/png, image/jpeg" name="img" placeholder="Photo" required id="file">
+                <label class="btn btn-outline-dark" for="file"><div>Choisissez un fichier</div></label>
                 <br>
                 <textarea class="form-control" name="desc" cols="100%" rows="5" placeholder="Description" required></textarea>
                 <button type="submit" class="submit btn btn-outline-dark">Ajouter</button>
@@ -37,6 +37,24 @@
         </div>
 
         <style>
+
+            #file {
+                display: none;
+            }
+
+            .inputfile + label {
+                display: inline-block;
+                border : 3px solid;
+                margin: 10px 35%;
+                width: 30%;
+                font-size: 25px;
+                cursor: pointer; /* "hand" cursor */
+            }
+
+            /* .inputfile:focus + label,
+            .inputfile + label:hover {
+                background-color: red;
+            } */
 
             .img {
                 border-radius: 25px 25px 0 0;
@@ -94,6 +112,20 @@
                 'height': cw + 'px'
                 });
             }
+
+            var inputs = document.querySelectorAll( '.inputfile' );
+            Array.prototype.forEach.call( inputs, function( input )
+            {
+                var label = input.nextElementSibling;
+                var labelVal = label.innerHTML;
+
+                input.addEventListener( 'change', function( e )
+                {
+                    var fileName = this.files[0].name;
+                    if( fileName )
+                        label.innerHTML = fileName;
+                });
+            });
         </script>
 
     </body>
