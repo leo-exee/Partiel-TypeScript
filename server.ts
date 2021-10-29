@@ -59,10 +59,10 @@ app.get('/', async (req, res) => {
 
 
     const dbConnection = getConnection("dataBase");
-    dbConnection.query(`SELECT title, "desc", img FROM "imgDatabase" WHERE id > 0;`, function (error, results, fields) {
+    dbConnection.query(`SELECT * FROM "imgDatabase" WHERE id > 0;`, function (error, results, fields) {
         if (error) throw error;
 
-        var data = results.rows.map((item) => { return { title: item.title, img: item.img, desc: item.desc } });
+        var data = results.rows.map((item) => { return { id: item.id, title: item.title, img: item.img, desc: item.desc } });
         
         res.render('index', { imgData: data });
     });
@@ -98,6 +98,23 @@ app.post('/send', async (req, res) => {
         
     });
 
+});
+
+app.post('/removeImg', function (req, res) {
+    try {
+        const dbConnection = getConnection("dataBase");
+        const id = req.body.id;
+        try {
+            fs.unlinkSync(`./img/img${id}.jpg`);
+        } catch (err) {
+            console.error(err)
+        }
+        dbConnection.query(`DELETE FROM "imgDatabase" WHERE id = ${id};`, function (error, results, fields) { if (error) throw error; });
+        res.redirect("/");
+    } catch (e) {
+        res.status(500).send("File not removed");
+        console.log(e);
+    }
 });
 
 app.listen(port, () => {
